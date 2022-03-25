@@ -26,7 +26,7 @@ function LoaderDisplay(){
 
 	var updateList = function() {
 		var loaded = true;
-		var list = '<h2>LOADING</h2><ul>';
+		var list = '<ul>';
 		for (var i = 0; i < loadingElements.length; i++){
 			var el = loadingElements[i];
 			if (!el.loaded){
@@ -37,14 +37,15 @@ function LoaderDisplay(){
 			}
 		}
 		list += '</ul>';
-
-		if (loaded){
+		
+		if (loaded) {
 			list += '<a href="#" onclick="return false;" id="startButton" class="active">START</a>';
-		}else{
+		} else{
 			list += '<a href="#" onclick="return false;" class="inactive">START</a>';	
 		}
 
-		domElement.html(list);
+		var header = `<h2>${loaded ? 'READY' : 'LOADING'}</h2>`
+		domElement.html(header + list);
 
 		isComplete = loaded;
 	}
