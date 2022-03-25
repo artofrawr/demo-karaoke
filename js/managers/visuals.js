@@ -1,218 +1,227 @@
 function VisualizationManager() {
-	this.loaded = true;
+  this.loaded = true;
 
-	var posX = 0;
+  var posX = 0;
 
-	// dimensions
-	var dimensions = {
-		width: 0,
-		height: 0,
-		halfY: 0,
-		halfX: 0,
-		xScale: 0.667,
-		yScale: 0.667,
-		mousePercX: 0.5,
-		mousePercY: 0.5
-	};
+  // dimensions
+  var dimensions = {
+    width: 0,
+    height: 0,
+    halfY: 0,
+    halfX: 0,
+    xScale: 0.667,
+    yScale: 0.667,
+    mousePercX: 0.5,
+    mousePercY: 0.5,
+  };
 
-	// sound
-	var volumeRange = 50;
-	var pitchRange = 300;
-	var volumes = [];
+  // sound
+  var volumeRange = 50;
+  var pitchRange = 300;
+  var volumes = [];
 
-	var pitchesFuture = [];
-	var pitchesPast = [];
+  var pitchesFuture = [];
+  var pitchesPast = [];
 
-	var oldPitch = 0;
+  var oldPitch = 0;
 
-	// Three.js Scene
-	var clock, camera, scene, renderer, tanFOV, initialWindowHeight;
+  // Three.js Scene
+  var clock, camera, scene, renderer, tanFOV, initialWindowHeight;
 
-	// Elements
-	var container;
-	var bubbles;
-	var curves;
-	var glow;
-	var grid;
-	var snake;
-	var sparkler;
-	var stars;
-	var trail;
+  // Elements
+  var container;
+  var bubbles;
+  var curves;
+  var glow;
+  var grid;
+  var snake;
+  var sparkler;
+  var stars;
+  var trail;
 
-	var oldPos = [];
+  var oldPos = [];
 
-	var touching = false;
-	var songState = 0;
-	var cameraChangeComplete = false;
-    
-	this.init = function() {
-		// CREATE SCENE
-		clock = new THREE.Clock();
-		renderer = new THREE.WebGLRenderer();
-		renderer.setSize( 1473, 810 );
-		document.body.appendChild( renderer.domElement );
+  var touching = false;
+  var songState = 0;
+  var cameraChangeComplete = false;
 
-		scene = new THREE.Scene();
+  this.init = function () {
+    // CREATE SCENE
+    clock = new THREE.Clock();
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize(1473, 810);
+    document.body.appendChild(renderer.domElement);
 
-		camera = new THREE.PerspectiveCamera( 30, 1473 / 810, 1, 2000 );
-		camera.position.x = 0; 
-		camera.position.y = 0; 
-		camera.position.z = 1000; 
-		camera.lookAt( scene.position );
-		scene.add(camera);
+    scene = new THREE.Scene();
 
-		tanFOV = Math.tan( ( ( Math.PI / 180 ) * camera.fov / 2 ) );
-		initialWindowHeight = 810;
+    camera = new THREE.PerspectiveCamera(30, 1473 / 810, 1, 2000);
+    camera.position.x = 0;
+    camera.position.y = 0;
+    camera.position.z = 1000;
+    camera.lookAt(scene.position);
+    scene.add(camera);
 
-		dimensions.width = window.innerWidth*dimensions.xScale;
-		dimensions.height = window.innerHeight*dimensions.yScale;
-		dimensions.halfX = 0.5*dimensions.width;
-		dimensions.halfY = 0.5*dimensions.height;
+    tanFOV = Math.tan(((Math.PI / 180) * camera.fov) / 2);
+    initialWindowHeight = 810;
 
-		container = new THREE.Object3D();
+    dimensions.width = window.innerWidth * dimensions.xScale;
+    dimensions.height = window.innerHeight * dimensions.yScale;
+    dimensions.halfX = 0.5 * dimensions.width;
+    dimensions.halfY = 0.5 * dimensions.height;
 
-		// -------------------------------------
+    container = new THREE.Object3D();
 
-		bubbles = new Bubbles();
-		bubbles.init(container, dimensions);
+    // -------------------------------------
 
-		grid = new Grid();
-		grid.init(container, dimensions);
+    bubbles = new Bubbles();
+    bubbles.init(container, dimensions);
 
-		glow = new Glow();
-		glow.init(container, dimensions);
+    grid = new Grid();
+    grid.init(container, dimensions);
 
-		progressbar = new ProgressBar();
-		progressbar.init(container, dimensions, false);
+    glow = new Glow();
+    glow.init(container, dimensions);
 
-		stars = new Stars();
-		stars.init(container, dimensions);
+    progressbar = new ProgressBar();
+    progressbar.init(container, dimensions, false);
 
-		sparkler = new Sparkler();
-		sparkler.init(container, dimensions);
-	
-		snake = new Snake();
-		snake.init(container, dimensions);
+    stars = new Stars();
+    stars.init(container, dimensions);
 
-		curves = new Curves();
-		curves.init(container, dimensions); 
+    sparkler = new Sparkler();
+    sparkler.init(container, dimensions);
 
-		trail = new Trail();
-		trail.init(container, dimensions);
+    snake = new Snake();
+    snake.init(container, dimensions);
 
-		// -------------------------------------
+    curves = new Curves();
+    curves.init(container, dimensions);
 
-		container.y = 100;
-		scene.add( container );
+    trail = new Trail();
+    trail.init(container, dimensions);
 
-		window.addEventListener('resize', resizeCanvas, false);
-		$(document).on('mousemove', onmove);
-		document.addEventListener( 'touchstart', startouch, false );
-		document.addEventListener( 'touchend', endtouch, false );
-		document.addEventListener( 'touchmove', touch, false );
+    // -------------------------------------
 
-		resizeCanvas();
-	}
+    container.y = 100;
+    scene.add(container);
 
-	var endtouch = function(event){
-		oldPos = [];
-		touching = false;
-	}
-	var startouch = function(event){
-		touching = true;
-	}
-	var touch = function(event){
-		event.preventDefault();
-		event.stopPropagation();
+    window.addEventListener("resize", resizeCanvas, false);
+    $(document).on("mousemove", onmove);
+    document.addEventListener("touchstart", startouch, false);
+    document.addEventListener("touchend", endtouch, false);
+    document.addEventListener("touchmove", touch, false);
 
-		var pX = event.touches[ 0 ].pageX;
-		var pY = event.touches[ 0 ].pageY;
+    resizeCanvas();
+  };
 
-		if (oldPos.length > 0){
-			var dX = (pX - oldPos[0]) / window.innerWidth;
-			var dY = (pY - oldPos[1]) / window.innerHeight;
-			
-			dimensions.mousePercX += dX;
-			dimensions.mousePercY += dY;   
-		}
-		oldPos = [pX, pY];
-	}
+  var endtouch = function (event) {
+    oldPos = [];
+    touching = false;
+  };
+  var startouch = function (event) {
+    touching = true;
+  };
+  var touch = function (event) {
+    event.preventDefault();
+    event.stopPropagation();
 
-	this.drawProgressBar = function(midiManager){
-		progressbar.drawEvents(midiManager);
-	}
+    var pX = event.touches[0].pageX;
+    var pY = event.touches[0].pageY;
 
-	var onmove = function(e){
-		if (touching == false){
-			dimensions.mousePercX = e.pageX/window.innerWidth;
-			dimensions.mousePercY = e.pageY/window.innerHeight;
-		}
-	}
+    if (oldPos.length > 0) {
+      var dX = (pX - oldPos[0]) / window.innerWidth;
+      var dY = (pY - oldPos[1]) / window.innerHeight;
 
-	var resizeCanvas = function(){
-		// ADJUST SCALE VARS
-		dimensions.width = window.innerWidth*dimensions.xScale;
-		dimensions.height = window.innerHeight*dimensions.yScale;
-		dimensions.halfX = 0.5*dimensions.width;
-		dimensions.halfY = 0.5*dimensions.height;
+      dimensions.mousePercX += dX;
+      dimensions.mousePercY += dY;
+    }
+    oldPos = [pX, pY];
+  };
 
-		// ADJUST CAMERA
-		camera.aspect = window.innerWidth / window.innerHeight;
-		camera.fov = ( 360 / Math.PI ) * Math.atan( tanFOV * ( window.innerHeight / initialWindowHeight ) );
-		camera.updateProjectionMatrix();
-		camera.lookAt( scene.position );
+  this.drawProgressBar = function (midiManager) {
+    progressbar.drawEvents(midiManager);
+  };
 
-		renderer.setSize( window.innerWidth, window.innerHeight );
+  var onmove = function (e) {
+    if (touching == false) {
+      dimensions.mousePercX = e.pageX / window.innerWidth;
+      dimensions.mousePercY = e.pageY / window.innerHeight;
+    }
+  };
 
-		// resize elements
-		bubbles.resize(dimensions);
-		grid.resize(dimensions);
-		glow.resize(dimensions);
-		stars.resize(dimensions);
-		sparkler.resize(dimensions);
-		snake.resize(dimensions);
-		curves.resize(dimensions);
-		trail.resize(dimensions);
+  var resizeCanvas = function () {
+    // ADJUST SCALE VARS
+    dimensions.width = window.innerWidth * dimensions.xScale;
+    dimensions.height = window.innerHeight * dimensions.yScale;
+    dimensions.halfX = 0.5 * dimensions.width;
+    dimensions.halfY = 0.5 * dimensions.height;
 
-		// render
-		renderer.render( scene, camera );
-	}
+    // ADJUST CAMERA
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.fov =
+      (360 / Math.PI) *
+      Math.atan(tanFOV * (window.innerHeight / initialWindowHeight));
+    camera.updateProjectionMatrix();
+    camera.lookAt(scene.position);
 
-	this.render = function(progress, volVoice, volMusic, freqs, pitches) {     
-		posX -= 10;
-		var pos = posX + 'px 0px';
+    renderer.setSize(window.innerWidth, window.innerHeight);
 
-		var delta = clock.getDelta(); 
+    // resize elements
+    bubbles.resize(dimensions);
+    grid.resize(dimensions);
+    glow.resize(dimensions);
+    stars.resize(dimensions);
+    sparkler.resize(dimensions);
+    snake.resize(dimensions);
+    curves.resize(dimensions);
+    trail.resize(dimensions);
 
-		volumes.unshift(volVoice);
-		if (volumes.length > 500) {
-			volumes.splice(199, 300);
-		}
+    // render
+    renderer.render(scene, camera);
+  };
 
-		pitchesFuture = pitches;
-		
-		var newPitch = oldPitch + (pitches[0].pitch - oldPitch)*0.1;
-		oldPitch = newPitch;
+  this.render = function (progress, volVoice, volMusic, freqs, pitches) {
+    posX -= 10;
+    var pos = posX + "px 0px";
 
-		var active = (pitches[0].active == true) ? 1 : 0;
+    var delta = clock.getDelta();
 
-		pitchesPast.unshift(newPitch);
-		if (pitchesPast.length > 200) {
-			pitchesPast.splice(99, 100);
-		}
+    volumes.unshift(volVoice);
+    if (volumes.length > 500) {
+      volumes.splice(199, 300);
+    }
 
-		bubbles.update(volMusic, songState);
-		stars.update();
-		sparkler.update(delta, dimensions, songState);
-		snake.update(pitchRange, pitchesFuture, volMusic);
-		curves.update(pitchRange, pitchesPast, volumes);
-		trail.update(dimensions, pitchRange, pitchesPast, volumes, songState, active);
-		progressbar.update(progress);
+    pitchesFuture = pitches;
 
-		renderer.render( scene, camera );
-	}
+    var newPitch = oldPitch + (pitches[0].pitch - oldPitch) * 0.1;
+    oldPitch = newPitch;
 
-	var easeInOutSine = function (t, b, c, d) {
-		return -c/2 * (Math.cos(Math.PI*t/d) - 1) + b;
-	};
+    var active = pitches[0].active == true ? 1 : 0;
+
+    pitchesPast.unshift(newPitch);
+    if (pitchesPast.length > 200) {
+      pitchesPast.splice(99, 100);
+    }
+
+    bubbles.update(volMusic, songState);
+    stars.update();
+    sparkler.update(delta, dimensions, songState);
+    snake.update(pitchRange, pitchesFuture, volMusic);
+    curves.update(pitchRange, pitchesPast, volumes);
+    trail.update(
+      dimensions,
+      pitchRange,
+      pitchesPast,
+      volumes,
+      songState,
+      active
+    );
+    progressbar.update(progress);
+
+    renderer.render(scene, camera);
+  };
+
+  var easeInOutSine = function (t, b, c, d) {
+    return (-c / 2) * (Math.cos((Math.PI * t) / d) - 1) + b;
+  };
 }

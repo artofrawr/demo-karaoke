@@ -1,60 +1,61 @@
-function LoaderDisplay(){
-	var _self = this;
-	var domElement = $('.loader');
-	var loadingElements = [];
-	var loadingMessages = [];
-	var isComplete = false;
-	var intervalId;
+function LoaderDisplay() {
+  var _self = this;
+  var domElement = $(".loader");
+  var loadingElements = [];
+  var loadingMessages = [];
+  var isComplete = false;
+  var intervalId;
 
-	this.addLoader = function(el, message){
-		loadingElements.push(el);
-		loadingMessages.push(message);
-	}
+  this.addLoader = function (el, message) {
+    loadingElements.push(el);
+    loadingMessages.push(message);
+  };
 
-	this.start = function(){
-		updateList();
-		intervalId = setInterval(_self.checkProgress, 500);
-	}
+  this.start = function () {
+    updateList();
+    intervalId = setInterval(_self.checkProgress, 500);
+  };
 
-	this.checkProgress = function(){
-		updateList();
-		if(isComplete == true){
-			clearInterval(intervalId);
-			onComplete();
-		}
-	}
+  this.checkProgress = function () {
+    updateList();
+    if (isComplete == true) {
+      clearInterval(intervalId);
+      onComplete();
+    }
+  };
 
-	var updateList = function() {
-		var loaded = true;
-		var list = '<ul>';
-		for (var i = 0; i < loadingElements.length; i++){
-			var el = loadingElements[i];
-			if (!el.loaded){
-				loaded = false;
-				list += '<li>' + loadingMessages[i] + " [ ]" + '</li>' ;
-			}else{
-				list += '<li>' + loadingMessages[i] + " [x]" + '</li>' ;
-			}
-		}
-		list += '</ul>';
-		
-		if (loaded) {
-			list += '<a href="#" onclick="return false;" id="startButton" class="active">START</a>';
-		} else{
-			list += '<a href="#" onclick="return false;" class="inactive">START</a>';	
-		}
+  var updateList = function () {
+    var loaded = true;
+    var list = "<ul>";
+    for (var i = 0; i < loadingElements.length; i++) {
+      var el = loadingElements[i];
+      if (!el.loaded) {
+        loaded = false;
+        list += "<li>" + loadingMessages[i] + " [ ]" + "</li>";
+      } else {
+        list += "<li>" + loadingMessages[i] + " [x]" + "</li>";
+      }
+    }
+    list += "</ul>";
 
-		var header = `<h2>${loaded ? 'READY' : 'LOADING'}</h2>`
-		domElement.html(header + list);
+    if (loaded) {
+      list +=
+        '<a href="#" onclick="return false;" id="startButton" class="active">START</a>';
+    } else {
+      list += '<a href="#" onclick="return false;" class="inactive">START</a>';
+    }
 
-		isComplete = loaded;
-	}
+    var header = `<h2>${loaded ? "READY" : "LOADING"}</h2>`;
+    domElement.html(header + list);
 
-	var onComplete = function(){
-		domElement.trigger('complete');
-	}
+    isComplete = loaded;
+  };
 
-	this.animateOut = function(){
-		domElement.hide();
-	}
+  var onComplete = function () {
+    domElement.trigger("complete");
+  };
+
+  this.animateOut = function () {
+    domElement.hide();
+  };
 }

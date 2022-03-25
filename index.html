@@ -1,184 +1,192 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns = "http://www.w3.org/1999/xhtml">
-    <head>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <title>Karaoke | A Web Audio API + WebGL demo</title>
-        <meta property="og:url" content="https://demo-karaoke.artofrawr.com">
-        <meta property="og:title" content="Karaoke: A Web Audio API + WebGL demo"> 
-        <meta property="og:type" content="website"> 
-        <meta property="og:image" content="https://demo-karaoke.artofrawr.com/images/karaoke.jpg"> 
-        <meta property="og:site_name" content="The Art of Rawr"> 
-        <meta property="og:description" content="A tech demo, utilizing the Web Audio API and WebGL. The 'Art of Rawr' is the digital playground of NYC based tech lead and full stack developer Jens Fischer.">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>Karaoke | A Web Audio API + WebGL demo</title>
+    <meta property="og:url" content="https://demo-karaoke.artofrawr.com" />
+    <meta property="og:title" content="Karaoke: A Web Audio API + WebGL demo" />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:image"
+      content="https://demo-karaoke.artofrawr.com/images/karaoke.jpg"
+    />
+    <meta property="og:site_name" content="The Art of Rawr" />
+    <meta
+      property="og:description"
+      content="A tech demo, utilizing the Web Audio API and WebGL. The 'Art of Rawr' is the digital playground of NYC based tech lead and full stack developer Jens Fischer."
+    />
 
-        <style>
-            @import url("https://fonts.googleapis.com/css?family=Roboto:400");
+    <style>
+      @import url("https://fonts.googleapis.com/css?family=Roboto:400");
 
-            html{
-                background: #e4e4e4;
-                padding: 0px;
-                margin: 0px;
-            }
+      html {
+        background: #e4e4e4;
+        padding: 0px;
+        margin: 0px;
+      }
 
-            body{
-                padding: 0px;
-                margin: 0px;
-            }
+      body {
+        padding: 0px;
+        margin: 0px;
+      }
 
-            .loader{
-                font-family: Arial, Helvetica, sans-serif;
-                background: #3b1829;
-                display: flex;
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                width: 300px;
-                height: 300px;
-                margin-top: -150px;
-                margin-left: -150px;
-                text-align: center;
-                color: #ffffff;
-								justify-content: center;
-								align-items: center;
-								flex-direction: column;
-            }
+      .loader {
+        font-family: Arial, Helvetica, sans-serif;
+        background: #3b1829;
+        display: flex;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 300px;
+        height: 300px;
+        margin-top: -150px;
+        margin-left: -150px;
+        text-align: center;
+        color: #ffffff;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
 
-            .loader ul{
-                list-style: none;
-                margin: 0px;
-                padding: 0px;
-            }
+      .loader ul {
+        list-style: none;
+        margin: 0px;
+        padding: 0px;
+      }
 
-            .loader ul li{
-                margin: 0px;
-                padding: 0px;
-            }
+      .loader ul li {
+        margin: 0px;
+        padding: 0px;
+      }
 
-            .loader a{
-                display: block;
-                width: 150px;
-                background: #ffc7bb;
-                color: #691f31;
-                padding: 10px;
-                text-decoration: none;
-								margin-top: 30px;
-								margin-bottom: 20px;
-            }
+      .loader a {
+        display: block;
+        width: 150px;
+        background: #ffc7bb;
+        color: #691f31;
+        padding: 10px;
+        text-decoration: none;
+        margin-top: 30px;
+        margin-bottom: 20px;
+      }
 
-            .loader a.inactive{
-                opacity: 0.25;
-            }
+      .loader a.inactive {
+        opacity: 0.25;
+      }
 
-            .loader a.active:hover, .loader a.active:active{
-                background: #ffffff;
-                color: #691f31;
-            }
+      .loader a.active:hover,
+      .loader a.active:active {
+        background: #ffffff;
+        color: #691f31;
+      }
 
-            canvas {
-                background: #000000;
-            }
+      canvas {
+        background: #000000;
+      }
 
-            .description {
-                position: fixed;
-                bottom: 0;
-                height: 80px;
-                padding: 0;
-                margin: 0;
-                width: 100%;
-                z-index: 9001;
-                line-height: 80px;
-            }
+      .description {
+        position: fixed;
+        bottom: 0;
+        height: 80px;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        z-index: 9001;
+        line-height: 80px;
+      }
 
-            .description p {
-                margin: 0;
-                padding: 0 0 0 20px;
-                font-family: "Roboto", sans-serif;
-                font-weight: 500;
-                letter-spacing: 0.01em;
-                font-size: 16px;
-                color: white;
-                line-height: 80px;
-                width: auto;
-                display: inline-block;
-            }
+      .description p {
+        margin: 0;
+        padding: 0 0 0 20px;
+        font-family: "Roboto", sans-serif;
+        font-weight: 500;
+        letter-spacing: 0.01em;
+        font-size: 16px;
+        color: white;
+        line-height: 80px;
+        width: auto;
+        display: inline-block;
+      }
 
-            .description .links {
-                float: right;
-                display: inline-block;
-                margin-right: 15px;
-                font-size: 0px;
-            }
+      .description .links {
+        float: right;
+        display: inline-block;
+        margin-right: 15px;
+        font-size: 0px;
+      }
 
-            .description a {
-                display: inline-block;
-                margin: 18px 5px 0 5px;
-                border: 2px solid white;
-                padding: 0 20px;
-                font-family: "Roboto", sans-serif;
-                font-weight: 500;
-                letter-spacing: 0.01em;
-                font-size: 16px;
-                color: white;
-                line-height: 40px;
-                height: 40px;
-                text-decoration: none;
-            }
-            .description a:hover {
-                border-color: white;
-                background: white;
-                color: black;
-            }
-            @media screen and (max-width: 650px) {
-                .description {
-                    text-align: center;
-                }
-                .description p {
-                    display: none;
-                }
-                .description .links {
-                    float: none;
-                    margin: 0;
-                }
-            }
-        </style>
-    </head>
+      .description a {
+        display: inline-block;
+        margin: 18px 5px 0 5px;
+        border: 2px solid white;
+        padding: 0 20px;
+        font-family: "Roboto", sans-serif;
+        font-weight: 500;
+        letter-spacing: 0.01em;
+        font-size: 16px;
+        color: white;
+        line-height: 40px;
+        height: 40px;
+        text-decoration: none;
+      }
+      .description a:hover {
+        border-color: white;
+        background: white;
+        color: black;
+      }
+      @media screen and (max-width: 650px) {
+        .description {
+          text-align: center;
+        }
+        .description p {
+          display: none;
+        }
+        .description .links {
+          float: none;
+          margin: 0;
+        }
+      }
+    </style>
+  </head>
 
-    <body>
-        <div class="description">
-            <p>Match up the staff lines for the right pitch.</p>
-            <div class="links">
-                <a href="https://github.com/artofrawr/demo-karaoke" target="_blank">Source on GitHub</a>
-            </div>
-        </div>
+  <body>
+    <div class="description">
+      <p>Match up the staff lines for the right pitch.</p>
+      <div class="links">
+        <a href="https://github.com/artofrawr/demo-karaoke" target="_blank"
+          >Source on GitHub</a
+        >
+      </div>
+    </div>
 
-        <div class="loader"></div>
+    <div class="loader"></div>
 
-        <script src="js/libs/three.min.js" type="text/javascript"></script>
-        <script src="js/libs/buffer-loader.js" type="text/javascript"></script>
-        
-        <script src="js/vis/bubbles.js" type="text/javascript"></script>
-        <script src="js/vis/curves.js" type="text/javascript"></script>
-        <script src="js/vis/glow.js" type="text/javascript"></script>
-        <script src="js/vis/grid.js" type="text/javascript"></script>
-        <script src="js/vis/progressbar.js" type="text/javascript"></script>
-        <script src="js/vis/snake.js" type="text/javascript"></script>
-        <script src="js/vis/sparkler.js" type="text/javascript"></script>
-        <script src="js/vis/stars.js" type="text/javascript"></script>
-        <script src="js/vis/textureanimator.js" type="text/javascript"></script>
-        <script src="js/vis/trail.js" type="text/javascript"></script>
+    <script src="js/libs/three.min.js" type="text/javascript"></script>
+    <script src="js/libs/buffer-loader.js" type="text/javascript"></script>
 
-        <script src="js/libs/jquery.js" type="text/javascript"></script>
+    <script src="js/vis/bubbles.js" type="text/javascript"></script>
+    <script src="js/vis/curves.js" type="text/javascript"></script>
+    <script src="js/vis/glow.js" type="text/javascript"></script>
+    <script src="js/vis/grid.js" type="text/javascript"></script>
+    <script src="js/vis/progressbar.js" type="text/javascript"></script>
+    <script src="js/vis/snake.js" type="text/javascript"></script>
+    <script src="js/vis/sparkler.js" type="text/javascript"></script>
+    <script src="js/vis/stars.js" type="text/javascript"></script>
+    <script src="js/vis/textureanimator.js" type="text/javascript"></script>
+    <script src="js/vis/trail.js" type="text/javascript"></script>
 
-        <script src="js/utils/loaderDisplay.js" type="text/javascript"></script>
-        <script src="js/utils/detector.js" type="text/javascript"></script>
+    <script src="js/libs/jquery.js" type="text/javascript"></script>
 
-        <script src="js/midi/stream.js" type="text/javascript"></script>
-        <script src="js/midi/midifile.js" type="text/javascript"></script>
+    <script src="js/utils/loaderDisplay.js" type="text/javascript"></script>
+    <script src="js/utils/detector.js" type="text/javascript"></script>
 
+    <script src="js/midi/stream.js" type="text/javascript"></script>
+    <script src="js/midi/midifile.js" type="text/javascript"></script>
 
-        <script src="js/managers/midi.js" type="text/javascript"></script> 
-        <script src="js/managers/sound.js" type="text/javascript"></script>
-        <script src="js/managers/visuals.js" type="text/javascript"></script> 
+    <script src="js/managers/midi.js" type="text/javascript"></script>
+    <script src="js/managers/sound.js" type="text/javascript"></script>
+    <script src="js/managers/visuals.js" type="text/javascript"></script>
 
-        <script src="js/main.js" type="text/javascript"></script>
-    </body>
+    <script src="js/main.js" type="text/javascript"></script>
+  </body>
 </html>
