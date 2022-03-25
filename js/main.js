@@ -1,9 +1,8 @@
 /**
- * A web audio api + webGL demo.
+ * A Web Audio API + WebGL demo.
  *
  * @author Jens Fischer
- * @link http://artofrawr.com/demos/karaoke
- * @link https://github.com/artofrawr/demos/blob/master/karaoke
+ * @link https://github.com/artofrawr/demo-karaoke
  */
 
 
@@ -12,13 +11,12 @@
 // ————————————————————————————————————————————————————————————
 
 $(document).ready(function() {
+	if (Detector.checkDependencies() == true) {
 
-	if (Detector.checkDependencies() == true){
-		
 		Detector.audiocontext = new window.AudioCtx();
 		new Karaoke();
 		
-	}else{
+	} else {
 
 		if (!window.AudioCtx){
 			alert("Dependency not met: Audio API");
@@ -40,7 +38,6 @@ $(document).ready(function() {
 // ————————————————————————————————————————————————————————————
 
 function Karaoke() {
-
 	// instantiate classes that handle different aspects of the demo
 	this.loaderDisplay = new LoaderDisplay();
 	this.visManager = new VisualizationManager();
@@ -57,13 +54,13 @@ function Karaoke() {
 	this.loaderDisplay.addLoader(this.soundManager, 'Music');
 	this.loaderDisplay.addLoader(this.visManager, 'Visualization');
 	this.loaderDisplay.start();
+
 	$('.loader').on('complete', this.onLoadComplete.bind(this) );
 
 	// LOAD ASSETS
 	this.midiManager.init(70);
 	this.soundManager.init();
 	this.visManager.init();
-
 }
 
 Karaoke.soundPitch = 1;
@@ -82,56 +79,53 @@ Karaoke.prototype.start = function() {
 
 
 Karaoke.prototype.render = function() {
+  requestAnimationFrame(this.render.bind(this));
 
-    requestAnimationFrame( this.render.bind(this) );
-
-    // calculate current progress of song
+  // calculate current progress of song
 	var progress = this.soundManager.getProgress();
 
 	if(progress >= 1){
 		window.location.reload();
 	}
 
-    this.ticks++;
-	progressPerTick = progress/this.ticks;
-
+  this.ticks++;
+	progressPerTick = progress / this.ticks;
 
 	// get future pitches for next 30 ticks
 	var pitches = [];
 	for (var tick = 0; tick <= 30; tick++){
-    	var pitch = this.midiManager.getPitchFor( progress+progressPerTick*tick-2*progressPerTick );
-    	pitches.push(pitch);
+		var pitch = this.midiManager.getPitchFor( progress+progressPerTick*tick-2*progressPerTick );
+		pitches.push(pitch);
 	}
 
 	// get volumes and frequencies
-    var i, sum, max, vol;
+  var i, sum, max, vol;
 	var soundData = this.soundManager.getByteFrequencyData();
 
 	// voice volume
 	sum = 0;
 	max = 0;
-    for (i = 0; i < soundData.voice.length; i++){
-      vol = soundData.voice[i];
-      if(vol>max)max=vol;
-      sum += vol
-    }
-    var volVoice = (sum/soundData.voice.length)/max;
+	for (i = 0; i < soundData.voice.length; i++){
+		vol = soundData.voice[i];
+		if(vol>max)max=vol;
+		sum += vol
+	}
+	var volVoice = (sum/soundData.voice.length)/max;
 
-    // music volume
-    sum = 0;
+	// music volume
+	sum = 0;
 	max = 0;
-    for (i = 0; i < soundData.music.length; i++){
-      vol = soundData.music[i];
-      if(vol>max)max=vol;
-      sum += vol
-    }
-    var volMusic = (sum/soundData.music.length)/max;
+	for (i = 0; i < soundData.music.length; i++){
+		vol = soundData.music[i];
+		if(vol>max)max=vol;
+		sum += vol
+	}
+	var volMusic = (sum/soundData.music.length)/max;
 
-    // frequency
-    var freqs = soundData.music;
+	// frequency
+	var freqs = soundData.music;
 
-    // render visualization
-    this.visManager.render(progress, volVoice, volMusic, freqs, pitches); 
-
+	// render visualization
+	this.visManager.render(progress, volVoice, volMusic, freqs, pitches);
 }
 

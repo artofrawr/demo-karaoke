@@ -1,7 +1,6 @@
-/*
-class to parse the .mid file format
-(depends on stream.js)
-*/
+/** 
+ * Class to parse the .mid file format (depends on stream.js)
+ */
 function MidiFile(data) {
 	function readChunk(stream) {
 		var id = stream.read(4);

@@ -1,5 +1,4 @@
 function LoaderDisplay(){
-
 	var _self = this;
 	var domElement = $('.loader');
 	var loadingElements = [];
@@ -57,7 +56,4 @@ function LoaderDisplay(){
 	this.animateOut = function(){
 		domElement.hide();
 	}
-
-
-
 }

@@ -1,4 +1,3 @@
-
 window.AudioCtx = (function() { return window.AudioContext || window.mozAudioContext || window.webkitAudioContext || window.msAudioContext || window.oAudioContext; })();
 
 var Detector = {
@@ -13,5 +12,4 @@ var Detector = {
 	checkDependencies: function () {
 		return window.AudioCtx && Detector.webgl && (Detector.is_chrome || Detector.is_firefox);
 	}
-
 };

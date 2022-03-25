@@ -1,4 +1,3 @@
-
 function MidiManager(midiFile) {
 	var _self = this;
 
@@ -45,7 +44,7 @@ function MidiManager(midiFile) {
 		fetch.open('GET', path);
 		fetch.overrideMimeType("text/plain; charset=x-user-defined");
 		fetch.onreadystatechange = function() {
-			if(this.readyState == 4 && this.status == 200) {
+			if (this.readyState == 4 && this.status == 200) {
 				/* munge response into a binary string */
 				var t = this.responseText || "" ;
 				var ff = [];
@@ -65,20 +64,20 @@ function MidiManager(midiFile) {
 		var isActive = false;
 
 		for (var i = notes.length-1; i >= 0; i--){
-	    	var oNote = notes[i];
-	    	if( oNote.startPerc <= perc && oNote.endPerc >= perc){
-	    		pitch = oNote.notePerc;
-	    		isActive = true;
-	    	}else if( oNote.startPerc >= perc){
-	    		pitch = oNote.notePerc;
-	    		isActive = false;
-	    	}
-	    }
-    
-	    return {
-	    	pitch: pitch,
-	    	active: isActive
-	    };
+			var oNote = notes[i];
+			if( oNote.startPerc <= perc && oNote.endPerc >= perc){
+				pitch = oNote.notePerc;
+				isActive = true;
+			}else if( oNote.startPerc >= perc){
+				pitch = oNote.notePerc;
+				isActive = false;
+			}
+		}
+	
+		return {
+			pitch: pitch,
+			active: isActive
+		};
 	};
 
 	function afterLoad(){
@@ -106,28 +105,28 @@ function MidiManager(midiFile) {
 	}
 
 	var parseEventArray = function() {
-        var lastNote;
+		var lastNote;
 		var onEvt;
 
-	    for (var i = 0; i < events.length; i++){
-	    	var e = events[i];
-	    	if(e.type == 'on'){
-	    		onEvt = e;
-                lastNote = e.note;
-	    	}else{
-                if (e.note == lastNote){
-                    var nPerc = (e.note-note_low)/(note_high-note_low);
-		    		notes.push({
-		    		 	note: e.note,
-		    		 	notePerc: nPerc,
-		    		 	start: onEvt.ticks,
-		    		 	startPerc: onEvt.ticks/totalTicks,
-		    		 	end: e.ticks,
-		    		 	endPerc: e.ticks/totalTicks
-	    		    });
-                }
-	    	}
-	    }
+		for (var i = 0; i < events.length; i++){
+			var e = events[i];
+			if(e.type == 'on'){
+				onEvt = e;
+				lastNote = e.note;
+			}else{
+				if (e.note == lastNote){
+					var nPerc = (e.note-note_low)/(note_high-note_low);
+					notes.push({
+					 	note: e.note,
+					 	notePerc: nPerc,
+					 	start: onEvt.ticks,
+					 	startPerc: onEvt.ticks/totalTicks,
+					 	end: e.ticks,
+					 	endPerc: e.ticks/totalTicks
+					});
+				}
+			}
+		}
 
 	};
 
@@ -228,6 +227,4 @@ function MidiManager(midiFile) {
 				break;
 		}
 	}
-
-
 }
